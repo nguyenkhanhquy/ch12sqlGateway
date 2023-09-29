@@ -22,8 +22,8 @@ public class SqlGatewayServlet extends HttpServlet {
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		
 		req.setCharacterEncoding("UTF-8");
-	    resp.setCharacterEncoding("UTF-8");
-	    resp.setContentType("text/html; charset=UTF-8");
+	    	resp.setCharacterEncoding("UTF-8");
+	   	resp.setContentType("text/html; charset=UTF-8");
 	    
 		String sqlStatement = req.getParameter("sqlStatement");
 		String sqlResult = "";
@@ -35,7 +35,7 @@ public class SqlGatewayServlet extends HttpServlet {
 			// get a connection
 			String dbURL = "jdbc:mysql://ckshdphy86qnz0bj.cbetxkdyhwsb.us-east-1.rds.amazonaws.com:3306/qp0234c4b9oaaaqo";
 			String username = "egfhhn42qe6tla5p";
-			String password = "dkn0jsi5birxnlga";
+			String password = "ouj47qdnf053rb01";
 			Connection connection = DriverManager.getConnection(dbURL, username, password);
 			
 			// create statement
