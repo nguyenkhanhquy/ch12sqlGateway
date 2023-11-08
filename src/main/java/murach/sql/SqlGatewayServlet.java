@@ -14,33 +14,38 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-@WebServlet(urlPatterns = {"/sqlGateway"})
+@WebServlet(urlPatterns = { "/sqlGateway" })
 @SuppressWarnings("serial")
 public class SqlGatewayServlet extends HttpServlet {
 
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		
+
 		req.setCharacterEncoding("UTF-8");
-	    	resp.setCharacterEncoding("UTF-8");
-	   	resp.setContentType("text/html; charset=UTF-8");
-	    
+		resp.setCharacterEncoding("UTF-8");
+		resp.setContentType("text/html; charset=UTF-8");
+
 		String sqlStatement = req.getParameter("sqlStatement");
 		String sqlResult = "";
-		
+
 		// load the driver
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
-			
+
 			// get a connection
-			String dbURL = "jdbc:mysql://ckshdphy86qnz0bj.cbetxkdyhwsb.us-east-1.rds.amazonaws.com:3306/qp0234c4b9oaaaqo";
-			String username = "egfhhn42qe6tla5p";
-			String password = "ouj47qdnf053rb01";
-			Connection connection = DriverManager.getConnection(dbURL, username, password);
+			//String dbURL = "jdbc:mysql://localhost:3306/murach";
+			//String username = "root";
+			//String password = "1234";
 			
+			String dbURL = System.getenv("DATASOURCE_URL");
+			String username = System.getenv("DATASOURCE_USERNAME");
+			String password = System.getenv("DATASOURCE_PASSWORD");
+			
+			Connection connection = DriverManager.getConnection(dbURL, username, password);
+
 			// create statement
 			Statement statement = connection.createStatement();
-			
+
 			// parse the SQL string
 			sqlStatement = sqlStatement.trim();
 			if (sqlStatement.length() >= 6) {
@@ -49,7 +54,7 @@ public class SqlGatewayServlet extends HttpServlet {
 					// create the HTML for the result set
 					ResultSet resultSet = statement.executeQuery(sqlStatement);
 					sqlResult = SQLUtil.getHtmlTable(resultSet);
-					resultSet.close(); 
+					resultSet.close();
 				} else {
 					int i = statement.executeUpdate(sqlStatement);
 					if (i == 0) { // a DDL statement
@@ -63,15 +68,14 @@ public class SqlGatewayServlet extends HttpServlet {
 			connection.close();
 		} catch (ClassNotFoundException e) {
 			sqlResult = "<p>Error loading the database driver: <br>" + e.getMessage() + "</p>";
-			
-			
+
 		} catch (SQLException e) {
-			sqlResult ="<p>Error executing the SQL statement: <br>"+ e.getMessage() + "</p>";
+			sqlResult = "<p>Error executing the SQL statement: <br>" + e.getMessage() + "</p>";
 		}
 		HttpSession session = req.getSession();
 		session.setAttribute("sqlResult", sqlResult);
 		session.setAttribute("sqlStatement", sqlStatement);
-		
+
 		String url = "/index.jsp";
 		getServletContext().getRequestDispatcher(url).forward(req, resp);
 	}
